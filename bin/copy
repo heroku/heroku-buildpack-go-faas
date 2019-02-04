@@ -22,6 +22,7 @@ function ctt {
 mkdir -p ${TMP}/bin
 mkdir -p ${TMP}/lib/src/github.com/apg/patter/
 mkdir ${TMP}/vendor
+mkdir -p ${TMP}/lib/src/github.com/heroku
 
 # These are the files that are available during release
 ctt bin/compile
@@ -30,13 +31,13 @@ ctt bin/test
 ctt bin/test-compile
 ctt lib/common.sh
 ctt lib/src/github.com/apg/patter/main.go
-ctt lib/src/github.com/heroku/fngenerate
 ctt vendor/concurrency.sh
 ctt CHANGELOG.md
 ctt data.json
 ctt files.json
 ctt LICENSE
 ctt README.md
+cp -R lib/src/github.com/heroku/fngenerate "${TMP}/lib/src/github.com/heroku/"
 #/end
 
 EXTRAS="${1}"
