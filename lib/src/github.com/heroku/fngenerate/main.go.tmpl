@@ -1,0 +1,22 @@
+package main
+
+import (
+	"flag"
+	"net/http"
+	"log"
+
+	functions "{{.ImportPath}}"
+)
+
+func main() {
+	port := flag.String("p", "5000", "Web service port")
+	flag.Parse()
+	address := ":" + *port
+
+	{{range .Routes}}
+	http.HandleFunc("{{.Path}}", functions.{{.Function}})
+	{{end}}
+	if err := http.ListenAndServe(address, nil); err != nil {
+		log.Fatal(err)
+	}
+}
