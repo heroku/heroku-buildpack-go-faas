@@ -22,7 +22,7 @@ function ctt {
 mkdir -p ${TMP}/bin
 mkdir -p ${TMP}/lib/src/github.com/apg/patter/
 mkdir ${TMP}/vendor
-mkdir -p ${TMP}/lib/src/github.com/heroku/fngenerate/
+mkdir -p ${TMP}/lib/src/github.com/heroku
 
 # These are the files that are available during release
 ctt bin/compile
@@ -37,7 +37,7 @@ ctt data.json
 ctt files.json
 ctt LICENSE
 ctt README.md
-cp -R lib/src/github.com/heroku/fngenerate/* "${TMP}/lib/src/github.com/heroku/fngenerate"
+ctt lib/src/github.com/heroku/fngenerate
 #/end
 
 EXTRAS="${1}"
