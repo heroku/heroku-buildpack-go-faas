@@ -499,7 +499,7 @@ case "${TOOL}" in
 
         step "Running: go install"
         go install -v ${FLAGS[@]} github.com/heroku/fngenerate 2>&1
-        fngenerate -i ${src} -g ${depTOML} -t ${mainTMPL} > $fnrunnerPath/main.go
+        $GOPATH/bin/fngenerate -i ${src} -g ${depTOML} -t ${mainTMPL} > $fnrunnerPath/main.go
 
         go install -v ${FLAGS[@]} github.com/heroku/fnrunner 2>&1
         PROCFILE=${fnrunnerPath}/Procfile
