@@ -469,6 +469,13 @@ case "${TOOL}" in
 
         pwd
         ls
+        ls lib
+        echo "---"
+        ls lib/src
+        echo "---"
+        ls lib/src
+        echo "---"
+        ls lib/src/github.com
 
         fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
         mkdir -p "${fnrunnerPath}"
