@@ -469,13 +469,7 @@ case "${TOOL}" in
 
         pwd
         ls
-        ls lib
-        echo "---"
-        ls lib/src
-        echo "---"
-        ls lib/src
-        echo "---"
-        ls lib/src/github.com
+        ls -lR lib
 
         fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
         mkdir -p "${fnrunnerPath}"
@@ -483,7 +477,7 @@ case "${TOOL}" in
         echo "[metadata.heroku]\nroot-package = \"github.com/heroku/fnrunner\"" > $fnrunnerPath/Gopkg.toml
 
         mkdir "${GOPATH}/src/github.com/heroku/fngenerate"
-        cp -R "${fngeneratePath}/*" "${GOPATH}/src/github.com/heroku/fngenerate"
+        cp -R "${fngeneratePath}" "${GOPATH}/src/github.com/heroku"
 
         pkgs=${GO_INSTALL_PACKAGE_SPEC:-$(<${depTOML} tq '$.metadata.heroku["install"]')}
         if [ -z "${pkgs}" ]; then
