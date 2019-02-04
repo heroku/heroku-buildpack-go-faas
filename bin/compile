@@ -467,6 +467,14 @@ case "${TOOL}" in
         eval "$(setupGOPATH ${name})"
         depTOML="${src}/Gopkg.toml"
 
+        fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
+        mkdir -p "${fnrunnerPath}"
+        echo 'web: bin/fnrunner -p $PORT' > $fnrunnerPath/Procfile
+        echo "[metadata.heroku]\nroot-package = \"github.com/heroku/fnrunner\"" > $fnrunnerPath/Gopkg.toml
+
+        mkdir "${GOPATH}/src/github.com/heroku/fngenerate"
+        cp -R "${fngeneratePath}/*" "${GOPATH}/src/github.com/heroku/fngenerate"
+
         pkgs=${GO_INSTALL_PACKAGE_SPEC:-$(<${depTOML} tq '$.metadata.heroku["install"]')}
         if [ -z "${pkgs}" ]; then
             pkgs="default"
@@ -484,13 +492,6 @@ case "${TOOL}" in
         fi
         massagePkgSpecForVendor
 
-        fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
-        mkdir -p "${fnrunnerPath}"
-        echo 'web: bin/fnrunner -p $PORT' > $fnrunnerPath/Procfile
-        echo "[metadata.heroku]\nroot-package = \"github.com/heroku/fnrunner\"" > $fnrunnerPath/Gopkg.toml
-
-        mkdir "${GOPATH}/src/github.com/heroku/fngenerate"
-        cp -R "${fngeneratePath}/*" "${GOPATH}/src/github.com/heroku/fngenerate"
 
         step "Running: go install"
         go install -v ${FLAGS[@]} github.com/heroku/fngenerate 2>&1
