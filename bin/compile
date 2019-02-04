@@ -4,6 +4,7 @@
 set -eo pipefail
 
 mkdir -p "$1" "$2"
+runner=github.com/heroku/fnrunner
 build=$(cd "$1/" && pwd)
 cache=$(cd "$2/" && pwd)
 env_dir="${3}"
@@ -11,6 +12,8 @@ env_dir="${3}"
 buildpack=$(cd "$(dirname $0)/.." && pwd)
 source "${buildpack}/lib/common.sh"
 ensureInPath "jq-linux64" "${cache}/.jq/bin"
+fngeneratePath="${buildpack}/lib/src/github.com/heroku/fngenerate"
+mainTMPL="${fngeneratePath}/main.go.tmpl"
 
 DefaultGoVersion="$(<${DataJSON} jq -r '.Go.DefaultVersion')"
 DepVersion="$(<${DataJSON} jq -r '.Dep.DefaultVersion')"
@@ -396,6 +399,12 @@ setupGOPATH() {
     echo "src=${src}"
 }
 
+setupRunner() {
+  mkdir -p "${GOPATH}/src/${runner}"
+  local src=$1
+  local toml=$2
+}
+
 loadEnvDir "${env_dir}"
 
 setGitCredHelper "${env_dir}"
@@ -476,8 +485,20 @@ case "${TOOL}" in
         fi
         massagePkgSpecForVendor
 
-        step "Running: go install -v ${FLAGS[@]} ${pkgs}"
-        go install -v "${FLAGS[@]}" ${pkgs} 2>&1
+        local fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
+        mkdir -p "${fnrunnerPath}"
+        echo 'web: bin/fnrunner -p $PORT' > $fnrunnerPath/Procfile
+        echo "[metadata.heroku]\nroot-package = \"github.com/heroku/fnrunner\"" > $fnrunnerPath/Gopkg.toml
+
+        step "Running: go install"
+        go install -v ${FLAGS[@]} $fngeneratePath 2>&1
+        fngenerate -i ${src} -g ${depTOML} -t ${mainTMPL} > $fnrunnerPath/main.go
+
+        go install -v ${FLAGS[@]} github.com/heroku/fnrunner 2>&1
+        PROCFILE=${fnrunnerPath}/Procfile
+
+        #step "Running: go install -v ${FLAGS[@]} ${pkgs}"
+        #go install -v "${FLAGS[@]}" ${pkgs} 2>&1
     ;;
     godep)
         eval "$(setupGOPATH ${name})"

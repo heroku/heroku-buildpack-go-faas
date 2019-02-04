@@ -1,5 +1,5 @@
 [buildpack]
-name = "Go"
+name = "GoFunctions"
 
   [publish.Ignore]
   files = [
