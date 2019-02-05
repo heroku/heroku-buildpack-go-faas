@@ -467,10 +467,6 @@ case "${TOOL}" in
         eval "$(setupGOPATH ${name})"
         depTOML="${src}/Gopkg.toml"
 
-        pwd
-        ls
-        ls -lR lib
-
         fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
         mkdir -p "${fnrunnerPath}"
         echo 'web: bin/fnrunner -p $PORT' > $build/Procfile
