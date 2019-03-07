@@ -466,7 +466,7 @@ case "${TOOL}" in
     dep)
         eval "$(setupGOPATH ${name})"
         depTOML="${src}/Gopkg.toml"
-        herokuYAML="${src}/heroku.yaml"
+        herokuYAML="${src}/heroku.yml"
 
         fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
         mkdir -p "${fnrunnerPath}"
