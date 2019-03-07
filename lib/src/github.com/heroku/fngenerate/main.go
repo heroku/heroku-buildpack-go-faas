@@ -20,14 +20,8 @@ var (
 
 type YAML struct {
 	Build struct {
-		Functions map[string]Entry `functions`
+		Functions map[string]map[string]string `functions`
 	} `yaml:"build"`
-}
-
-type Entry struct {
-	Trigger string `yaml:"trigger"`
-	Name    string `yaml:"name"`
-	Path    string `yaml:"path"`
 }
 
 type Params struct {
@@ -69,23 +63,23 @@ func main() {
 	}
 
 	for _, f := range yml.Build.Functions {
-		switch f.Trigger {
+		switch f["trigger"] {
 		case "http":
-			if f.Name == "" {
+			if f["name"] == "" {
 				FatalIf(ErrMissingName)
 			}
 
-			if f.Path == "" {
+			if f["path"] == "" {
 				FatalIf(ErrMissingPath)
 			}
 
-			path := f.Path
+			path := f["path"]
 			if !strings.HasPrefix(path, "/") {
 				path = "/" + path
 			}
 
 			params.HTTP = append(params.HTTP, Route{
-				Name: f.Name,
+				Name: f["name"],
 				Path: path,
 			})
 
