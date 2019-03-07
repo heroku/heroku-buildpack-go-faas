@@ -9,32 +9,40 @@ import (
 	"strings"
 	"text/template"
 
-	toml "github.com/pelletier/go-toml"
-	"github.com/pelletier/go-toml/query"
+	yaml "gopkg.in/yaml.v2"
 )
 
 var (
-	ErrMissingFunc = errors.New("Missing `function`")
-	ErrMissingPath = errors.New("Missing `path`")
-	ErrInvalidFunc = errors.New("Invalid `function` value")
-	ErrInvalidPath = errors.New("Invalid `path` value")
+	ErrMissingName    = errors.New("Missing `name`")
+	ErrMissingPath    = errors.New("Missing `path`")
+	ErrInvalidTrigger = errors.New("Invalid `trigger` value")
 )
 
-const FuncQuery = "$.metadata.heroku.functions"
+type YAML struct {
+	Build struct {
+		Functions map[string]Entry `functions`
+	} `yaml:"build"`
+}
+
+type Entry struct {
+	Trigger string `yaml:"trigger"`
+	Name    string `yaml:"name"`
+	Path    string `yaml:"path"`
+}
 
 type Params struct {
 	ImportPath string
-	Routes     []Route
+	HTTP       []Route
 }
 
 type Route struct {
-	Function string
-	Path     string
+	Name string
+	Path string
 }
 
 func main() {
 	importPath := flag.String("i", "", "Customer import path")
-	tomlPath := flag.String("g", "", "Customer Gopkg.toml path")
+	yamlPath := flag.String("y", "", "Customer heroku.yaml path")
 	templatePath := flag.String("t", "", "Template file path")
 	flag.Parse()
 
@@ -49,46 +57,41 @@ func main() {
 	tmpl, err := template.New("main").Parse(string(content))
 	FatalIf(err)
 
-	tree, err := toml.LoadFile(*tomlPath)
+	file, err := os.Open(*yamlPath)
 	FatalIf(err)
 
-	results, err := query.CompileAndExecute(FuncQuery, tree)
+	var yml YAML
+	yaml.NewDecoder(file).Decode(&yml)
 	FatalIf(err)
 
 	params := Params{
 		ImportPath: *importPath,
-		Routes:     []Route{},
 	}
 
-	for _, v := range results.Values() {
-		trees := v.([]*toml.Tree)
-		for _, t := range trees {
-			function, ok := t.Get("function").(string)
-			if !ok {
-				FatalIf(ErrInvalidFunc)
+	for _, f := range yml.Build.Functions {
+		switch f.Trigger {
+		case "http":
+			if f.Name == "" {
+				FatalIf(ErrMissingName)
 			}
 
-			if function == "" {
-				FatalIf(ErrMissingFunc)
-			}
-
-			path, ok := t.Get("path").(string)
-			if !ok {
-				FatalIf(ErrInvalidPath)
-			}
-
-			if path == "" {
+			if f.Path == "" {
 				FatalIf(ErrMissingPath)
 			}
 
+			path := f.Path
 			if !strings.HasPrefix(path, "/") {
 				path = "/" + path
 			}
 
-			params.Routes = append(params.Routes, Route{
-				Function: function,
-				Path:     path,
+			params.HTTP = append(params.HTTP, Route{
+				Name: f.Name,
+				Path: path,
 			})
+
+			break
+		default:
+			FatalIf(ErrInvalidTrigger)
 		}
 	}
 
