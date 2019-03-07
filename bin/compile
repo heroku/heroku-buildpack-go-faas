@@ -466,6 +466,7 @@ case "${TOOL}" in
     dep)
         eval "$(setupGOPATH ${name})"
         depTOML="${src}/Gopkg.toml"
+        herokuYAML="${src}/heroku.yaml"
 
         fnrunnerPath="${GOPATH}/src/github.com/heroku/fnrunner"
         mkdir -p "${fnrunnerPath}"
@@ -495,7 +496,7 @@ case "${TOOL}" in
 
         step "Running: go install"
         go build -o $GOPATH/bin/fngenerate $GOPATH/src/github.com/heroku/fngenerate 2>&1
-        $GOPATH/bin/fngenerate -i ${name} -g ${depTOML} -t ${mainTMPL} > $fnrunnerPath/main.go
+        $GOPATH/bin/fngenerate -i ${name} -y ${herokuYAML} -t ${mainTMPL} > $fnrunnerPath/main.go
 
         go install ${FLAGS[@]} github.com/heroku/fnrunner 2>&1
         PROCFILE=${fnrunnerPath}/Procfile

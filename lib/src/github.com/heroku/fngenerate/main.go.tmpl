@@ -13,8 +13,8 @@ func main() {
 	flag.Parse()
 	address := ":" + *port
 
-	{{range .Routes}}
-	http.HandleFunc("{{.Path}}", functions.{{.Function}})
+	{{range .HTTP}}
+	http.HandleFunc("{{.Path}}", functions.{{.Name}})
 	{{end}}
 	if err := http.ListenAndServe(address, nil); err != nil {
 		log.Fatal(err)
