@@ -15,6 +15,7 @@ import (
 var (
 	ErrMissingName    = errors.New("Missing `name`")
 	ErrMissingPath    = errors.New("Missing `path`")
+	ErrMissingTopic   = errors.New("Missing `topic`")
 	ErrInvalidTrigger = errors.New("Invalid `trigger` value")
 )
 
@@ -27,11 +28,17 @@ type YAML struct {
 type Params struct {
 	ImportPath string
 	HTTP       []Route
+	Kafka      []Consumer
 }
 
 type Route struct {
 	Name string
 	Path string
+}
+
+type Consumer struct {
+	Name  string
+	Topic string
 }
 
 func main() {
@@ -83,6 +90,20 @@ func main() {
 				Path: path,
 			})
 
+			break
+		case "kafka":
+			if f["name"] == "" {
+				FatalIf(ErrMissingName)
+			}
+
+			if f["topic"] == "" {
+				FatalIf(ErrMissingTopic)
+			}
+
+			params.Kafka = append(params.Kafka, Consumer{
+				Name:  f["name"],
+				Topic: f["topic"],
+			})
 			break
 		default:
 			FatalIf(ErrInvalidTrigger)
