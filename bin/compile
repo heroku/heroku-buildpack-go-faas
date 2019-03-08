@@ -495,6 +495,8 @@ case "${TOOL}" in
 
 
         step "Running: go install"
+        go get github.com/joeshaw/envdecode
+        go get github.com/bsm/sarama-cluster
         go build -o $GOPATH/bin/fngenerate $GOPATH/src/github.com/heroku/fngenerate 2>&1
         $GOPATH/bin/fngenerate -i ${name} -y ${herokuYAML} -t ${mainTMPL} > $fnrunnerPath/main.go
 
