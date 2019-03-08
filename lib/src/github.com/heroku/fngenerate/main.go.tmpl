@@ -39,7 +39,7 @@ func main() {
 		config.Net.TLS.Enable = true
 
 		{{range .Kafka}}
-		go kafkaFunctionHandler(kc, brokers, "{{.Topic}}", functions.{{.Name}})
+		go kafkaFunctionHandler(config, brokers, "{{.Topic}}", functions.{{.Name}})
 		{{end}}
 	}
 
