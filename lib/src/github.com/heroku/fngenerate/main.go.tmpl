@@ -30,6 +30,7 @@ func main() {
 
 		tc := kc.createTLSConfig()
 		brokers := kc.brokerAddresses()
+		_ = brokers
 
 		config := cluster.NewConfig()
 		config.Consumer.Return.Errors = true
